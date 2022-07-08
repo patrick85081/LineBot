@@ -15,12 +15,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 
-builder.Services.AddTransient<LineMessagingClient>(p => 
+builder.Services.AddTransient<ILineMessagingClient, LineMessagingClient>(p => 
     new LineMessagingClient(p.GetRequiredService<LineBotConfig>().AccessToken));
 builder.Services.AddTransient<LineBotApp>();
 builder.Services.AddSingleton<LineBotConfig>(p => 
         p.GetRequiredService<IConfiguration>()
             .Bind<LineBotConfig>("LineBot"));
+builder.Services.AddTransient<ITextMessageHandler, TextMessageHandler>();
 
 var app = builder.Build();
 

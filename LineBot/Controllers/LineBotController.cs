@@ -17,11 +17,11 @@ namespace LineBot.Controllers
         private readonly LineBotConfig lineBotConfig;
         private readonly IHttpContextAccessor contextAccessor;
         private readonly ILogger<LineBotController> logger;
-        private readonly LineMessagingClient messagingClient;
+        private readonly ILineMessagingClient messagingClient;
         private readonly LineBotApp botApp;
 
         public LineBotController(
-            LineBotConfig config, LineMessagingClient messagingClient,
+            LineBotConfig config, ILineMessagingClient messagingClient,
             IHttpContextAccessor httpContextAccessor, ILogger<LineBotController> logger, LineBotApp botApp)
         {
             this.botApp = botApp;
@@ -29,7 +29,6 @@ namespace LineBot.Controllers
             this.logger = logger;
             this.lineBotConfig = config;
             this.contextAccessor = httpContextAccessor;
-            // logger.LogDebug(JsonConvert.SerializeObject(config));
         }
 
         [HttpGet("run")]
@@ -52,7 +51,7 @@ namespace LineBot.Controllers
             try 
             {
                 var events = await this.HttpContext.Request.GetWebhookEventsAsync(lineBotConfig.ChannelSecret);
-                logger.LogInformation(JsonConvert.SerializeObject(events));
+                logger.LogInformation(JsonConvert.SerializeObject(events, new Newtonsoft.Json.Converters.StringEnumConverter()));
 
                 await botApp.RunAsync(events);
             }
